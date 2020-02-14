@@ -24,6 +24,7 @@ So what is the scenario here? very simple, inject our own controlled domain that
 You might notice that the link arrives in an hyperlink, which hides the hostname within, might gain us a few more stealth points.
 
 When I hit back the reset form, I tried a few techniques that kept failing, ex: send `X-Forwarded-Host` header, replace `Host` header with our own one.
+
 After fuzzing around the `Host` header, I have found that the server must receive the whole original domain without any modifications, so how can we still control it and keep it whole?
 
 ![Huh?](https://media.giphy.com/media/kc0kqKNFu7v35gPkwB/giphy.gif)
@@ -43,7 +44,10 @@ Sec-Fetch-Mode: navigate
 __RequestVerificationToken=[VerificationToken]&Email=[InputEmail]
 ```
 
-The received email has our domain within its hyperlink, which contains the original domain as our subdomain that can be easily handled by create the subdomain **or** just set it in the `hosts` file (enough for this PoC).
-After settings our listener on port 80 and hitting the link, we got the victim's token and we're able to reset his password.
+We received the same email body with a modified hostname within the Hyperlink, which has the original domain as our subdomain `redacted.com.evil.com`.
+
+To complete the PoC we need to either create an `A` record at `evil.com` for `redacted.com` **or** just set it in the `hosts` file (enough for this PoC).
+
+After settings our listener on port 80 and hitting the link, **we got the victim's token and we're able to reset his password**.
 
 ![Voila](https://i.gyazo.com/be3039cd5ef990179e3c574b9479cf3f.png)
